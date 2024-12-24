@@ -28,6 +28,20 @@
 		"keepPlayFileKeywords": "",
         "recommend": "1"
 	},{
+    "key": "网盘推送",
+    "name": "💗网盘┃推送",
+    "type": 5,
+    "searchable": 0,
+    "filterClass": "",
+    "firstClass": "",
+    "filterPlay": "",
+    "firstPlay": "",
+    "ext": "https://ghproxy.cn/https://raw.githubusercontent.com/linsky123/tBox/refs/heads/main/newjs/网盘推送.js",
+    "flagable": 0,
+    "filterPlayFileKeywords": "",
+    "keepPlayFileKeywords": "",
+    "selectedPlayer": "0"
+  },{
 		"key": "kuwosong",
 		"name": "🎵酷我┃音乐",
 		"type": 5,
@@ -126,6 +140,34 @@
 		"keepPlayFileKeywords": "",
 		"selectedPlayer": "0"
 	},{
+    "key": "shandian",
+    "name": "⚡️闪电┃UC盘",
+    "type": 5,
+    "searchable": 1,
+    "filterClass": "",
+    "firstClass": "",
+    "filterPlay": "",
+    "firstPlay": "",
+    "ext": "https://ghproxy.cn/https://raw.githubusercontent.com/linsky123/tBox/refs/heads/main/newjs/shandian.js",
+    "flagable": 0,
+    "filterPlayFileKeywords": "",
+    "keepPlayFileKeywords": "",
+    "selectedPlayer": "0"
+  },{
+    "key": "omii",
+    "name": "🌕奥秘┃网盘",
+    "type": 5,
+    "searchable": 1,
+    "filterClass": "",
+    "firstClass": "",
+    "filterPlay": "",
+    "firstPlay": "",
+    "ext": "https://ghproxy.cn/https://raw.githubusercontent.com/linsky123/tBox/refs/heads/main/newjs/omii.js",
+    "flagable": 0,
+    "filterPlayFileKeywords": "",
+    "keepPlayFileKeywords": "",
+    "selectedPlayer": "0"
+  },{
 		"key": "ouge",
 		"name": "🏰欧歌┃网盘",
 		"type": 5,
