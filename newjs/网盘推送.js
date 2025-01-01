@@ -715,6 +715,24 @@ let vodpic = '';
 
 
 async function homeContent() {
+const classData = [
+    { "type_id": 1, "type_name": "网盘推送无首页数据，只有历史和收藏记录" }
+];
+       const list = [{
+           vod_id: '',
+           vod_name: '网盘推送无首页源',
+           vod_remarks: '左上角的"三"点进去推送',
+           vod_pic: ''
+         }];
+
+          return JSON.stringify({
+         code: 1,
+         msg: "数据列表",
+         page: "1",
+         limit: "20",
+         list: list,
+         class: classData
+       });
 }
 
 async function searchContent(keyword) {
@@ -758,35 +776,37 @@ try {
    const cloudNameCount = {};
    //await toast('正在加载网盘剧集信息',5);
    // 并发执行 fetchVideoFiles
-   const fetchPromises = cloudLinks.map(async (link, i) => {
-       if (link.includes('uc.cn') || link.includes('quark.cn')) {
-           let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘'; // 对应 vod_play_from
-           await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2); // 2 秒的持续时间
-           const result = await fetchVideoFiles(link); // 所有播放链接对应 vod_play_url
-           if (result) { // 检查 result 是否为空
-               // 检查云盘名称是否已经使用过
-               if (cloudNameCount[baseCloudName] === undefined) {
-                   cloudNameCount[baseCloudName] = 1;
-                   vod_play_from.push(baseCloudName);
-               } else {
-                   cloudNameCount[baseCloudName]++;
-                   vod_play_from.push(`${baseCloudName}${cloudNameCount[baseCloudName]}`);
-               }
 
-              vod_play_url.push(result.result);
-              if (vodpic === '') {
-                  vodpic = result.vodpic;
-              }
-              if (vodname === '') {
-                vodname = result.vodname;
-            }
-
+       // 并发执行 fetchVideoFiles
+       const fetchPromises = cloudLinks.map(async (link, i) => {
+         if (link.includes('uc.cn') || link.includes('quark.cn')) {
+           let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘';
+           await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2);
+           const result = await fetchVideoFiles(link);
+           if (result) {
+             return { index: i, baseCloudName, result };
            }
-       }
-   });
+         }
+         return null;
+       });
+       const results = await Promise.all(fetchPromises);
+       results.forEach((item) => {
+         if (item) {
+           const { index, baseCloudName, result } = item;
+           if (cloudNameCount[baseCloudName] === undefined) {
+             cloudNameCount[baseCloudName] = 1;
+             vod_play_from[index] = baseCloudName;
+           } else {
+             cloudNameCount[baseCloudName]++;
+             vod_play_from[index] = `${baseCloudName}${cloudNameCount[baseCloudName]}`;
+           }
+           vod_play_url[index] = result;
+         }
+       });
+       vod_play_from = vod_play_from.filter(Boolean);
+       vod_play_url = vod_play_url.filter(Boolean);
 
-   // 等待所有并发请求完成
-   await Promise.all(fetchPromises);
+
 
    // 将提取的信息组织成一个对象
    const movieDetails = {

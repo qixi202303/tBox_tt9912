@@ -1457,110 +1457,127 @@ if (isQuark) {
    //  .then(data => console.log(data))
    //  .catch(error => console.error('Error:', error));
    
-   //获取影视详情信息
-   async function detailContent(ids) {
-     const url = `${webSite}${ids}`;
-     try {
-       //console.log(url);
-       await toast('正在加载玩偶影片信息',2);
-       const html = await 访问网页(url);
-       // 使用正则表达式提取信息
-       const vod_id = ids;
-       const vod_name = html.match(/<h1 class="page-title">(.*?)<\/h1>/)[1] || '未知片名';
-           //console.log(vod_name);
-       const vod_year = 文本_取中间(文本_取中间(html, '年代：</span>', '/a>'), '_blank">', '<') || '';
-       //console.log(vod_year);
-       const vod_director = 移除html代码(html.match(/<div class="video-info-items"><span class="video-info-itemtitle">导演：<\/span>([\s\S]*?)<\/div>/)[1].trim()) || '未知';
+
+
+  async function detailContent(ids) {
+    const url = `${webSite}${ids}`;
+    try {
+        //console.log(url);
+        await toast('正在加载玩偶影片信息', 2);
+        const html = await 访问网页(url);
+        // 使用正则表达式提取信息
+        const vod_id = ids;
+        const vod_name = html.match(/<h1 class="page-title">(.*?)<\/h1>/)[1] || '未知片名';
+        //console.log(vod_name);
+        const vod_year = 文本_取中间(文本_取中间(html, '年代：</span>', '/a>'), '_blank">', '<') || '';
+        //console.log(vod_year);
+        const vod_director = 移除html代码(html.match(/<div class="video-info-items"><span class="video-info-itemtitle">导演：<\/span>([\s\S]*?)<\/div>/)[1].trim()) || '未知';
         //console.log(vod_director);
-       const vod_actor = 移除html代码(html.match(/<div class="video-info-items"><span class="video-info-itemtitle">主演：<\/span>([\s\S]*?)<\/div>/)[1].trim()) || '未知';
-       //console.log(vod_actor);
-       const vod_pic = html.match(/<img class="lazyload" data-src="(.*?)"/)[1] || '';
-       //console.log(vod_pic);
-       let vod_remarks='';
-       if(html.indexOf('备注：</span>') !== -1){
-       vod_remarks = 文本_取中间(文本_取中间(html, '备注：</span>', '/div>'), 'info-item">', '<') || '';
-       }else if(html.indexOf('集数：</span>') !== -1){
-           vod_remarks = 文本_取中间(文本_取中间(html, '集数：</span>', '/div>'), 'info-item">', '<') || '';
-       }
+        const vod_actor = 移除html代码(html.match(/<div class="video-info-items"><span class="video-info-itemtitle">主演：<\/span>([\s\S]*?)<\/div>/)[1].trim()) || '未知';
+        //console.log(vod_actor);
+        const vod_pic = html.match(/<img class="lazyload" data-src="(.*?)"/)[1] || '';
+        //console.log(vod_pic);
+        let vod_remarks = '';
+        if (html.indexOf('备注：</span>') !== -1) {
+            vod_remarks = 文本_取中间(文本_取中间(html, '备注：</span>', '/div>'), 'info-item">', '<') || '';
+        } else if (html.indexOf('集数：</span>') !== -1) {
+            vod_remarks = 文本_取中间(文本_取中间(html, '集数：</span>', '/div>'), 'info-item">', '<') || '';
+        }
         //console.log(vod_remarks);
-       const vod_content = 移除html代码(文本_取中间(html, '<p class="sqjj_a" style="display: none;">', '<span class="sq_jj red">')) || '暂无剧情';
-       //console.log(vod_content);
-       const cloudLinks = html.match(/<a class="btn-pc btn-down fzlj" href="(.*?)"/g).map(link => link.replace(/<a class="btn-pc btn-down fzlj" href="/, '').replace(/" title=".*?">/g, '')) || [];
-       //console.log(cloudLinks);
-       // 初始化 vod_play_from 和 vod_play_url
-       let vod_play_from = [];
-       let vod_play_url = [];
-       // 记录云盘名称的使用次数
-       const cloudNameCount = {};
-       //await toast('正在加载网盘剧集信息',5);
-   for (let i = 0; i < cloudLinks.length; i++) {
-     const link = cloudLinks[i];
-     if (link.includes('uc.cn') || link.includes('quark.cn')) {
-      let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘'; // 对应 vod_play_from
-       await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2); // 2 秒的持续时间
-       const result = await fetchVideoFiles(link); // 所有播放链接对应 vod_play_url
-       if (result) { // 检查 result 是否为空
-         // 检查云盘名称是否已经使用过
-         if (cloudNameCount[baseCloudName] === undefined) {
-           cloudNameCount[baseCloudName] = 1;
-           vod_play_from.push(baseCloudName);
-         } else {
-           cloudNameCount[baseCloudName]++;
-           vod_play_from.push(`${baseCloudName}${cloudNameCount[baseCloudName]}`);
+        const vod_content = 移除html代码(文本_取中间(html, '<p class="sqjj_a" style="display: none;">', '<span class="sq_jj red">')) || '暂无剧情';
+        //console.log(vod_content);
+        const cloudLinks = html.match(/<a class="btn-pc btn-down fzlj" href="(.*?)"/g).map(link => link.replace(/<a class="btn-pc btn-down fzlj" href="/, '').replace(/" title=".*?">/g, '')) || [];
+        //console.log(cloudLinks);
+        // 初始化 vod_play_from 和 vod_play_url
+        let vod_play_from = [];
+        let vod_play_url = [];
+        // 记录云盘名称的使用次数
+        const cloudNameCount = {};
+        //await toast('正在加载网盘剧集信息',5);
+
+
+       // 并发执行 fetchVideoFiles
+       const fetchPromises = cloudLinks.map(async (link, i) => {
+         if (link.includes('uc.cn') || link.includes('quark.cn')) {
+           let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘';
+           await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2);
+           const result = await fetchVideoFiles(link);
+           if (result) {
+             return { index: i, baseCloudName, result };
+           }
          }
-   
-         vod_play_url.push(result);
-       }
-     }
-   }
-       // 将提取的信息组织成一个对象
-       const movieDetails = {
-         code: 1,
-         msg: "数据列表",
-         page: 1,
-         pagecount: 1,
-         limit: "20",
-         total: 1,
-         list: [{
-           vod_id: vod_id,
-           vod_name: vod_name,
-           vod_pic: vod_pic,
-           vod_actor: vod_actor,
-           vod_director: vod_director,
-           vod_remarks: vod_remarks,
-           vod_year: vod_year,
-           vod_content: vod_content,
-           vod_play_from: vod_play_from.join('$$$'),
-           vod_play_url: vod_play_url.join('$$$')
-         }]
-       };
-   
-       // 处理 vod_play_from 和 vod_play_url
-       const playFromList = movieDetails.list[0].vod_play_from.split('$$$');
-       const playUrlList = movieDetails.list[0].vod_play_url.split('$$$');
-   
-       const filteredPlayFromList = [];
-       const filteredPlayUrlList = [];
-   
-       for (let i = 0; i < playUrlList.length; i++) {
-         if (!playUrlList[i].includes('该网盘已取消了分享')) {
-           filteredPlayFromList.push(playFromList[i]);
-           filteredPlayUrlList.push(playUrlList[i]);
+         return null;
+       });
+       const results = await Promise.all(fetchPromises);
+       results.forEach((item) => {
+         if (item) {
+           const { index, baseCloudName, result } = item;
+           if (cloudNameCount[baseCloudName] === undefined) {
+             cloudNameCount[baseCloudName] = 1;
+             vod_play_from[index] = baseCloudName;
+           } else {
+             cloudNameCount[baseCloudName]++;
+             vod_play_from[index] = `${baseCloudName}${cloudNameCount[baseCloudName]}`;
+           }
+           vod_play_url[index] = result;
          }
-       }
-   
-       movieDetails.list[0].vod_play_from = filteredPlayFromList.join('$$$');
-       movieDetails.list[0].vod_play_url = filteredPlayUrlList.join('$$$');
-   
-       // 返回 JSON 字符串
-       console.log(JSON.stringify(movieDetails));
-       return JSON.stringify(movieDetails);
-     } catch (error) {
-       console.error('Error fetching movie details:', error);
-       return JSON.stringify({ code: 0, msg: "获取数据失败", error: error.message });
-     }
-   }
-   
+       });
+       vod_play_from = vod_play_from.filter(Boolean);
+       vod_play_url = vod_play_url.filter(Boolean);
+
+
+
+        // 将提取的信息组织成一个对象
+        const movieDetails = {
+            code: 1,
+            msg: "数据列表",
+            page: 1,
+            pagecount: 1,
+            limit: "20",
+            total: 1,
+            list: [{
+                vod_id: vod_id,
+                vod_name: vod_name,
+                vod_pic: vod_pic,
+                vod_actor: vod_actor,
+                vod_director: vod_director,
+                vod_remarks: vod_remarks,
+                vod_year: vod_year,
+                vod_content: vod_content,
+                vod_play_from: vod_play_from.join('$$$'),
+                vod_play_url: vod_play_url.join('$$$')
+            }]
+        };
+
+        // 处理 vod_play_from 和 vod_play_url
+        const playFromList = movieDetails.list[0].vod_play_from.split('$$$');
+        const playUrlList = movieDetails.list[0].vod_play_url.split('$$$');
+
+        const filteredPlayFromList = [];
+        const filteredPlayUrlList = [];
+
+        for (let i = 0; i < playUrlList.length; i++) {
+            if (!playUrlList[i].includes('该网盘已取消了分享')) {
+                filteredPlayFromList.push(playFromList[i]);
+                filteredPlayUrlList.push(playUrlList[i]);
+            }
+        }
+
+        movieDetails.list[0].vod_play_from = filteredPlayFromList.join('$$$');
+        movieDetails.list[0].vod_play_url = filteredPlayUrlList.join('$$$');
+
+        // 返回 JSON 字符串
+        //console.log(JSON.stringify(movieDetails));
+        return JSON.stringify(movieDetails);
+    } catch (error) {
+        console.error('Error fetching movie details:', error);
+        return JSON.stringify({ code: 0, msg: "获取数据失败", error: error.message });
+    }
+}
+
+
+
+
    //detailContent('/voddetail/85273.html')
     // .then(data => console.log(data))
    //  .catch(error => console.error('Error:', error));

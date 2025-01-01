@@ -1,4 +1,4 @@
-
+const webSite = 'http://www.mucpan.cc';
  
  function newfetch(url, options) {
      options = options || {};
@@ -692,7 +692,7 @@ if (downloadUrl) {
  
  async function homeContent() {
    try {
-     const url = `http://www.mucpan.cc`;
+     const url = webSite;
      const html2 = await 访问网页(url);
      const html = 文本_取中间(html2, "最新影片</h2>", "</html>");
      // 使用正则表达式匹配所有的电影项
@@ -764,7 +764,7 @@ if (downloadUrl) {
  async function searchContent(keyword) {
      try {
          const encodedKeyword = encodeURIComponent(keyword);
-         const url = `http://www.mucpan.cc/index.php/vod/search.html?wd=${encodedKeyword}`;
+         const url = `${webSite}/index.php/vod/search.html?wd=${encodedKeyword}`;
          const html = await 访问网页(url);
          const items = 文本_取中间_批量(html,'<div class="module-search-item">','<div class="video-info-footer">');
          const list = items.map((item) => {
@@ -814,7 +814,7 @@ if (downloadUrl) {
    try {
      // 解析 extend 参数
      let extendObj = extend ? JSON.parse(extend) : null;
-     let url = `http://www.mucpan.cc/index.php/vod/show/id/${tid}/page/${pg}.html`;
+     let url = `${webSite}/index.php/vod/show/id/${tid}/page/${pg}.html`;
      // 替换 URL 中的占位符
      if (extendObj) {
        for (const [key, value] of Object.entries(extendObj)) {
@@ -867,7 +867,7 @@ if (downloadUrl) {
  
  //获取影视详情信息
  async function detailContent(ids) {
-   const url = `http://www.mucpan.cc${ids}`;
+   const url = `${webSite}${ids}`;
    try {
      //console.log(url);
      await toast('正在加载影片信息',2);
@@ -901,26 +901,40 @@ if (downloadUrl) {
      // 记录云盘名称的使用次数
      const cloudNameCount = {};
      //await toast('正在加载网盘剧集信息',5);
- for (let i = 0; i < cloudLinks.length; i++) {
-   const link = cloudLinks[i];
-   if (link.includes('uc.cn') || link.includes('quark.cn')) {
-    let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘'; // 对应 vod_play_from
-     await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2); // 2 秒的持续时间
-     const result = await fetchVideoFiles(link); // 所有播放链接对应 vod_play_url
-     if (result) { // 检查 result 是否为空
-       // 检查云盘名称是否已经使用过
-       if (cloudNameCount[baseCloudName] === undefined) {
-         cloudNameCount[baseCloudName] = 1;
-         vod_play_from.push(baseCloudName);
-       } else {
-         cloudNameCount[baseCloudName]++;
-         vod_play_from.push(`${baseCloudName}${cloudNameCount[baseCloudName]}`);
-       }
- 
-       vod_play_url.push(result);
-     }
-   }
- }
+
+
+
+        // 并发执行 fetchVideoFiles
+       const fetchPromises = cloudLinks.map(async (link, i) => {
+         if (link.includes('uc.cn') || link.includes('quark.cn')) {
+           let baseCloudName = link.includes('uc.cn') ? 'UC网盘' : '夸克网盘';
+           await toast(`正在获取第 ${i + 1} 个${baseCloudName}剧集信息`, 2);
+           const result = await fetchVideoFiles(link);
+           if (result) {
+             return { index: i, baseCloudName, result };
+           }
+         }
+         return null;
+       });
+       const results = await Promise.all(fetchPromises);
+       results.forEach((item) => {
+         if (item) {
+           const { index, baseCloudName, result } = item;
+           if (cloudNameCount[baseCloudName] === undefined) {
+             cloudNameCount[baseCloudName] = 1;
+             vod_play_from[index] = baseCloudName;
+           } else {
+             cloudNameCount[baseCloudName]++;
+             vod_play_from[index] = `${baseCloudName}${cloudNameCount[baseCloudName]}`;
+           }
+           vod_play_url[index] = result;
+         }
+       });
+       vod_play_from = vod_play_from.filter(Boolean);
+       vod_play_url = vod_play_url.filter(Boolean);
+
+
+
      // 将提取的信息组织成一个对象
      const movieDetails = {
        code: 1,
