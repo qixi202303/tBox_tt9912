@@ -294,6 +294,20 @@
 		"keepPlayFileKeywords": "",
 		"selectedPlayer": "2"
 	},{
+    "key": "bdbd",
+    "name": "修罗影视|直连",
+    "type": 5,
+    "searchable": 0,
+    "filterClass": "",
+    "firstClass": "",
+    "filterPlay": "",
+    "firstPlay": "",
+    "ext": "https://ghproxy.cn/https://raw.githubusercontent.com/qixi202303/tBox_tt9912/qixi202303-patch-1/newjs/bd.js",
+    "flagable": 0,
+    "filterPlayFileKeywords": "",
+    "keepPlayFileKeywords": "",
+    "selectedPlayer": "0"
+  },{
 		"key": "jcyjcy",
 		"name": "🍰囧次元┃直链",
 		"type": 5,
